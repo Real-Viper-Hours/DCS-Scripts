@@ -133,44 +133,43 @@ function RVH.selectRandomGroupWeighted(weightedGroups)
 
     for _, entry in ipairs(weightedGroups) do
 
-        if type(entry) ~= "table" then
-            RVH.log("ERROR: Invalid entry (not table)")
-            goto continue
-        end
+        if type(entry) == "table" then
 
-        local name = entry.name
-        local weight = entry.weight or 1
+            local name = entry.name
+            local weight = entry.weight or 1
 
-        if type(name) ~= "string" then
-            RVH.log("ERROR: Missing/invalid group name")
-            goto continue
-        end
+            if type(name) == "string" then
 
-        if type(weight) ~= "number" then
-            RVH.log("ERROR: Invalid weight for " .. name)
-            weight = 1
-        end
+                if type(weight) ~= "number" then
+                    RVH.log("ERROR: Invalid weight for " .. tostring(name))
+                    weight = 1
+                end
 
-        if weight < 0 then
-            RVH.log("ERROR: Negative weight for " .. name)
-            weight = 0
-        end
+                if weight < 0 then
+                    weight = 0
+                end
 
-        local g = Group.getByName(name)
+                local g = Group.getByName(name)
 
-        if g then
-            totalWeight = totalWeight + weight
+                if g then
+                    totalWeight = totalWeight + weight
 
-            table.insert(pool, {
-                name = name,
-                group = g,
-                cumulative = totalWeight
-            })
+                    table.insert(pool, {
+                        name = name,
+                        group = g,
+                        cumulative = totalWeight
+                    })
+                else
+                    RVH.log("ERROR: Group not found: " .. tostring(name))
+                end
+
+            else
+                RVH.log("ERROR: Missing/invalid group name")
+            end
+
         else
-            RVH.log("ERROR: Group not found: " .. tostring(name))
+            RVH.log("ERROR: Invalid entry (not table)")
         end
-
-        ::continue::
     end
 
     if #pool == 0 then
